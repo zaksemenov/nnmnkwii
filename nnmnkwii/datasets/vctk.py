@@ -121,6 +121,10 @@ available_speakers = [
     "376",
 ]
 assert len(available_speakers) == 108
+import os
+if 'BASE_WAV_DIR' not in os.environ:
+    raise Exception('BASE_WAV_DIR not set')
+import os; available_speakers = os.listdir(os.environ.get('BASE_WAV_DIR'))
 
 
 def _parse_speaker_info(data_root):
@@ -140,8 +144,8 @@ def _parse_speaker_info(data_root):
             assert len(fields) == 4 or len(fields) == 5 or len(fields) == 6
             ID = fields[0]
             speaker_info[ID] = {}
-            speaker_info[ID]["AGE"] = int(fields[1])
-            speaker_info[ID]["GENDER"] = fields[2]
+            speaker_info[ID]["AGE"] = int(fields[2])
+            speaker_info[ID]["GENDER"] = fields[1]
             speaker_info[ID]["ACCENTS"] = fields[3]
             if len(fields) > 4:
                 speaker_info[ID]["REGION"] = " ".join(fields[4:])
@@ -179,10 +183,10 @@ class _VCTKBaseDataSource(FileDataSource):
     def _validate(self):
         # should have pair of transcription and wav files
         for idx, speaker in enumerate(self.speakers):
-            txt_files = sorted(glob(join(self.data_root, "txt", "p" + speaker,
-                                         "p{}_*.txt".format(speaker))))
-            wav_files = sorted(glob(join(self.data_root, "wav48", "p" + speaker,
-                                         "p{}_*.wav".format(speaker))))
+            txt_files = sorted(glob(join(self.data_root, "txt", speaker,
+                                         "*.txt")))
+            wav_files = sorted(glob(join(self.data_root, "wav48", speaker,
+                                         "*.wav")))
             assert len(txt_files) > 0
             for txt_path, wav_path in zip(txt_files, wav_files):
                 assert splitext(basename(txt_path))[0] == splitext(basename(wav_path))[0]
@@ -203,8 +207,8 @@ class _VCTKBaseDataSource(FileDataSource):
         else:
             max_files_per_speaker = self.max_files // len(self.speakers)
         for idx, speaker in enumerate(self.speakers):
-            speaker_dir = join(root, "p" + speaker)
-            files = sorted(glob(join(speaker_dir, "p{}_*{}".format(speaker, ext))))
+            speaker_dir = join(root, speaker)
+            files = sorted(glob(join(speaker_dir, "*{}".format(ext))))
             files = files[:max_files_per_speaker]
             if not is_wav:
                 files = list(map(lambda s: open(s, "rb").read().decode("utf-8")[:-1], files))
