@@ -11,7 +11,7 @@ import subprocess
 import os
 import numpy as np
 
-version = '0.0.14'
+version = '0.0.15'
 
 # Adapted from https://github.com/pytorch/pytorch
 cwd = os.path.dirname(os.path.abspath(__file__))
@@ -146,7 +146,7 @@ setup(
         'numpy >= 1.11.0',
         'scipy',
         'cython >= ' + min_cython_ver,
-        'bandmat',
+        'bandmat >= 0.7',
         'fastdtw',
         'sklearn',
         'pysptk >= 0.1.7',
